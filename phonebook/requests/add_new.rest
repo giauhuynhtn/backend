@@ -1,0 +1,9 @@
+POST http://localhost:3005/api/persons
+
+
+Content-Type: application/json
+
+{
+    "content": "other",
+    "important": false
+}
