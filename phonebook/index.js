@@ -23,7 +23,9 @@ let notes = [
       "number": "39-23-6423122"
     },
     {
-        "id": 5
+        "id": 5,
+        "name": "Hanna",
+        "number": "98-12921-11"
     }
 ]
 
