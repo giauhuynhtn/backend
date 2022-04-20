@@ -1,0 +1,7 @@
+POST http://localhost:3006/api/notes
+Content-Type: application/json
+
+{
+    "content": "Code quality ",
+    "important": true
+}
