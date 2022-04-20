@@ -3,8 +3,6 @@ const app = express()
 const cors = require('cors')
 require('dotenv').config()
 const Note = require('./models/note')
-const { default: mongoose } = require('mongoose')
-
 
 const requestLogger = (request, response, next) => {
     console.log('Method:', request.method)
@@ -13,11 +11,11 @@ const requestLogger = (request, response, next) => {
     console.log('---')
     next()
 }
-
-app.use(requestLogger)
-app.use(express.json());
-app.use(cors());
 app.use(express.static('build'))
+app.use(express.json());
+app.use(requestLogger)
+app.use(cors());
+
 
 
 app.get('/', (req, res) => {
@@ -49,24 +47,59 @@ app.post('/api/notes', (request, response) => {
   
 })
 
-app.delete('/api/notes/:id', (request, response) => {
-  const id = Number(request.params.id)
-  notes = notes.filter(note => note.id !== id)
+app.put('/api/notes/:id', (request, response, next) => {
+  const body = request.body
 
-  response.status(204).end()
+  const note = {
+    content: body.content,
+    important: body.important,
+  }
+
+  Note.findByIdAndUpdate(request.params.id, note, { new: true })
+    .then(updatedNote => {
+      response.json(updatedNote)
+    })
+    .catch(error => next(error))
 })
 
-app.get('/api/notes/:id', (req, res) => {
-  Note.findById(req.param.id).then(note => {
-    res.json(note)
-  })
+app.delete('/api/notes/:id', (request, response, next) => {
+  Note.findByIdAndRemove(request.params.id)
+    .then(result => {
+      response.status(204).end()
+    })
+    .catch(error => next(error))
+})
+
+app.get('/api/notes/:id', (req, res, next) => {
+  Note.findById(req.params.id)
+    .then(note => {
+      if (note) {
+        res.json(note)
+      } else {
+        res.status(404).end()
+      }
+    })
+    .catch(error => next(error))
 })
 
 const unknownEndpoint = (request, response) => {
-    response.status(404).send({ error: 'unknown endpoint' })
+    res.status(404).send({ error: 'unknown endpoint' })
   }
   
 app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } 
+
+  next(error)
+}
+
+// this has to be the last loaded middleware.
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3006
 app.listen(PORT, () => {
