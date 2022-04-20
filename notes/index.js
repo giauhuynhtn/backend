@@ -22,13 +22,13 @@ let notes = [
     important: true
   }
 ]
-
-app.use(express.json());
-app.use(cors());
-
-app.get('/', (req, res) => {
-  res.send('<h1>Hello World!</h1>')
-})
+const requestLogger = (request, response, next) => {
+    console.log('Method:', request.method)
+    console.log('Path:  ', request.path)
+    console.log('Body:  ', request.body)
+    console.log('---')
+    next()
+}
 
 const generateId = () => {
   const maxId = notes.length > 0
@@ -36,6 +36,16 @@ const generateId = () => {
     : 0
   return maxId + 1
 }
+
+app.use(requestLogger)
+app.use(express.json());
+app.use(cors());
+app.use(express.static('build'))
+
+
+app.get('/', (req, res) => {
+  res.send('<h1>Hello World!</h1>')
+})
 
 app.post('/api/notes', (request, response) => {
   const body = request.body
@@ -80,12 +90,14 @@ app.get('/api/notes/:id', (request, response) => {
   }
 })
 
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' })
+  }
+  
+app.use(unknownEndpoint)
 
-const PORT = process.env.PORT || 3007
+
+const PORT = process.env.PORT || 3006
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
-
-
-// git clone https://github.com/heroku/node-js-getting-started.git
-// cd node-js-getting-started
