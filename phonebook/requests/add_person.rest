@@ -1,7 +1,7 @@
-POST http://localhost:3005/api/persons
+POST http://localhost:3030/api/persons
 Content-Type: application/json
 
 {
-    "name": "Hino",
-    "number": "8-48467-977"
+    "name": "Era Hub",
+    "number": "010-9989-5968"
 }

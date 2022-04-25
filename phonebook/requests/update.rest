@@ -1,0 +1,7 @@
+PUT http://localhost:3030/api/persons/625ff81ba2d85bd44de63f01
+Content-Type: application/json
+
+{
+    "name": "Eragon Hub",
+    "number": "856-483-0002"
+}
